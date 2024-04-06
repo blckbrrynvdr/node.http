@@ -19,7 +19,12 @@ const city = argv._[0] || argv?.city;
 const apiKey = process.env.API_KEY;
 
 if (!apiKey) {
-	console.error('Api key is not installed');
+	console.error('Не установлен API ключ');
+	return;
+}
+
+if (!city) {
+	console.error('Не указан город');
 	return;
 }
 
