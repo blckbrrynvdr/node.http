@@ -3,8 +3,7 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const http = require("http");
-
-require("dotenv").config();
+const {API_KEY, WEATHER_API_PATH} = require('./config.js');
 
 const argv = yargs(hideBin(process.argv))
 	.option('city', {
@@ -16,9 +15,7 @@ const argv = yargs(hideBin(process.argv))
 
 const city = argv._[0] || argv?.city;
 
-const apiKey = process.env.API_KEY;
-
-if (!apiKey) {
+if (!API_KEY) {
 	console.error('Не установлен API ключ');
 	return;
 }
@@ -28,7 +25,7 @@ if (!city) {
 	return;
 }
 
-const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+const url = `${WEATHER_API_PATH}/current.json?key=${API_KEY}&q=${city}`;
 
 http.get(url, (res) => {
 	const {statusCode} = res;
@@ -43,12 +40,12 @@ http.get(url, (res) => {
 	res.on('data', (chunk) => rowData += chunk)
 	res.on('end', () => {
 		let parseData = JSON.parse(rowData);
-
-		console.log(`
-Данные о погоде в ${parseData.location.name} (${parseData.location.country}):
-Температура(°C): ${parseData.current.temp_c} (ощущается как ${parseData.current.feelslike_c}),
-Ветер(м/с): ${parseData.current.wind_kph}.`);
-	})
+		console.log(
+			`Данные о погоде в ${parseData.location.name} (${parseData.location.country}):\n`+
+			`Температура(°C): ${parseData.current.temp_c} (ощущается как ${parseData.current.feelslike_c}),\n`+
+			`Ветер(м/с): ${parseData.current.wind_kph}.\n`
+		);
+	});
 }).on('error', (err) => {
 	console.error(err)
 });
